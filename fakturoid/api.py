@@ -118,15 +118,14 @@ class Fakturoid(object):
     def _get(self, endpoint, params=None):
         return self._make_request('get', 200, endpoint, params=params)
 
-    def _post(self, endpoint, data):
-        return self._make_request('post', 201, endpoint, headers={'Content-Type': 'application/json'}, data=json.dumps(data))
+    def _post(self, endpoint, data, params=None):
+        return self._make_request('post', 201, endpoint, headers={'Content-Type': 'application/json'}, data=json.dumps(data), params=params)
 
     def _put(self, endpoint, data):
         return self._make_request('put', 200, endpoint,  headers={'Content-Type': 'application/json'}, data=json.dumps(data))
 
     def _delete(self, endpoint):
         return self._make_request('delete', 204, endpoint)
-
 
 class ModelApi(object):
     session = None
