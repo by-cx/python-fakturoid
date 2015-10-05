@@ -197,7 +197,7 @@ class SubjectsApi(CrudModelApi):
             if not isinstance(since, (datetime, date)):
                 raise TypeError("'since' parameter must be date or datetime")
             params['since'] = since.isoformat()
-        return super(SubjectsApi, self).find(params)
+        return ModelList(self, self.endpoint, params)
 
 
 class InvoicesApi(CrudModelApi):
