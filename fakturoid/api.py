@@ -203,7 +203,7 @@ class InvoiceActionApi(CrudModelApi):
         assert model.event in self._event_choices, "Event %s is not a valid value" % model.event
 
         result = self.session._post(self.endpoint % model.id, model.get_fields())
-        if result['json']:
+        if result and "json" in result and result['json']:
             model.update(result['json'])
 
 
