@@ -5,7 +5,7 @@ from dateutil.parser import parse
 
 from fakturoid import six
 
-__all__ = ['Account', 'Subject', 'InvoiceLine', 'Invoice', 'Generator']
+__all__ = ['Account', 'Subject', 'InvoiceLine', 'Invoice', 'Generator', "InvoiceAction", ]
 
 
 class Model(six.UnicodeMixin):
@@ -122,7 +122,7 @@ class AbstractInvoice(Model):
         super(AbstractInvoice, self).update(fields)
 
     def serialize_field_value(self, field, value):
-        result = super(AbstractInvoice, self).serialize_field_value(field, value);
+        result = super(AbstractInvoice, self).serialize_field_value(field, value)
         if field == 'lines':
             ids = map(lambda l: l.get('id'), result)
             for remote in self._loaded_lines:
@@ -166,3 +166,15 @@ class Generator(AbstractInvoice):
 
     def __unicode__(self):
         return self.name
+
+
+class InvoiceAction(Model):
+    """See http://docs.fakturoid.apiary.io/#reference/invoices/invoice-actions/ for complete field reference."""
+    event = None
+
+    class Meta:
+        readonly = [] #no id here, to correct update
+        decimal = ['id', ]
+
+    def __unicode__(self):
+        return "Event %s for invoice number %d" % (self.event, self.id)

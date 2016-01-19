@@ -5,7 +5,7 @@ from functools import wraps
 
 import requests
 
-from fakturoid.models import Account, Subject, Invoice, Generator
+from fakturoid.models import Account, Subject, Invoice, Generator, InvoiceAction
 from fakturoid.paging import ModelList
 
 __all__ = ['Fakturoid']
@@ -31,6 +31,7 @@ class Fakturoid(object):
             Subject: SubjectsApi(self),
             Invoice: InvoicesApi(self),
             Generator: GeneratorsApi(self),
+            InvoiceAction: InvoiceActionApi(self),
         }
 
     def model_api(model_type=None):
@@ -63,6 +64,10 @@ class Fakturoid(object):
     @model_api(Invoice)
     def invoices(self, mapi, *args, **kwargs):
         return mapi.find(*args, **kwargs)
+
+    @model_api(InvoiceAction)
+    def invoice_action(self, mapi, id, event):
+        return mapi.load(id, event)
 
     @model_api(Generator)
     def generator(self, mapi, id):
@@ -185,6 +190,21 @@ class AccountApi(ModelApi):
     def load(self):
         response = self.session._get(self.endpoint)
         return self.unpack(response)
+
+
+class InvoiceActionApi(CrudModelApi):
+    model_type = InvoiceAction
+    endpoint = "invoices/%d/fire"
+    _event_choices = ("mark_as_sent", "deliver", "pay", "pay_proforma",
+            "pay_partial_proforma", "remove_payment",
+            "deliver_reminder", "cancel", "undo_cancel", )
+
+    def save(self, model):
+        assert model.event in self._event_choices, "Event %s is not a valid value" % model.event
+
+        result = self.session._post(self.endpoint % model.id, model.get_fields())
+        if result['json']:
+            model.update(result['json'])
 
 
 class SubjectsApi(CrudModelApi):
