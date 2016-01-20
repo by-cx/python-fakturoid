@@ -202,6 +202,11 @@ class InvoiceActionApi(CrudModelApi):
     def save(self, model):
         assert model.event in self._event_choices, "Event %s is not a valid value" % model.event
 
+        paid_at = getattr(model, "paid_at", None)
+        if paid_at:
+            assert type(paid_at) == date, "paid_at is not Date instance"
+            setattr(model, "paid_at", paid_at.strftime("%Y-%m-%d"))
+
         result = self.session._post(self.endpoint % model.id, model.get_fields())
         if result['json']:
             model.update(result['json'])
