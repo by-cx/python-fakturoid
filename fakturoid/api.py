@@ -208,7 +208,7 @@ class InvoiceActionApi(CrudModelApi):
             setattr(model, "paid_at", paid_at.strftime("%Y-%m-%d"))
 
         result = self.session._post(self.endpoint % model.id, model.get_fields())
-        if result['json']:
+        if result and "json" in result and result['json']:
             model.update(result['json'])
 
 
