@@ -50,10 +50,10 @@ class Model(six.UnicodeMixin):
             return value.isoformat()
         return value
 
-    def get_fields(self):
+    def get_fields(self, include_readonly=False):
         data = {}
         for field, value in self.__dict__.items():
-            if self.is_field_writable(field, value):
+            if include_readonly or self.is_field_writable(field, value):
                 data[field] = self.serialize_field_value(field, value)
         return data
 
@@ -136,8 +136,8 @@ class AbstractInvoice(Model):
             return False
         return super(AbstractInvoice, self).is_field_writable(field, value)
 
-    def get_fields(self):
-        data = super(AbstractInvoice, self).get_fields()
+    def get_fields(self, include_readonly=False):
+        data = super(AbstractInvoice, self).get_fields(include_readonly)
         data.pop('_loaded_lines', None)
         return data
 
