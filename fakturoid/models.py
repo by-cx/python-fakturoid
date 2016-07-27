@@ -136,6 +136,11 @@ class AbstractInvoice(Model):
             return False
         return super(AbstractInvoice, self).is_field_writable(field, value)
 
+    def get_fields(self):
+        data = super(AbstractInvoice, self).get_fields()
+        data.pop('_loaded_lines', None)
+        return data
+
 
 class Invoice(AbstractInvoice):
     """See http://docs.fakturoid.apiary.io/ for complete field reference."""
