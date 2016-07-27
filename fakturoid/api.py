@@ -167,7 +167,9 @@ class CrudModelApi(ModelApi):
         response = self.session._get('{0}/{1}'.format(self.endpoint, id))
         return self.unpack(response)
 
-    def find(self, params={}, endpoint=None):
+    def find(self, params=None, endpoint=None):
+        if params is None:
+            params = {}
         response = self.session._get(endpoint or self.endpoint, params=params)
         return self.unpack(response)
 
