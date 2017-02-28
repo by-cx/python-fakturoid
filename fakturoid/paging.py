@@ -15,11 +15,13 @@ class PagedResource(object):
 
     def ensure_page_count(self):
         if self.page_count is None:
-            #load any page to get page count from headers
-            self.get_page(0)
+            try:
+                self.get_page(0)
+            except IndexError:
+                self.page_count = 0
 
     def get_page(self, n):
-        if self.page_count and n >= self.page_count:
+        if (self.page_count is not None) and n >= self.page_count:
             raise IndexError('index out of range')
         if n in self.pages:
             return self.pages[n]
@@ -31,6 +33,8 @@ class PagedResource(object):
 
     def __len__(self):
         self.ensure_page_count()
+        if self.page_count == 0:
+            return 0
         return self.page_size * (self.page_count-1) + len(self.get_page(self.page_count-1))
 
     def __getitem__(self, key):
