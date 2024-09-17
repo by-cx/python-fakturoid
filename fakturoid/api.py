@@ -171,7 +171,9 @@ class CrudModelApi(ModelApi):
         response = self.session._get('{0}/{1}'.format(self.endpoint, id))
         return self.unpack(response)
 
-    def find(self, params={}, endpoint=None):
+    def find(self, params=None, endpoint=None):
+        if params is None:
+            params = {}
         response = self.session._get(endpoint or self.endpoint, params=params)
         return self.unpack(response)
 
@@ -220,12 +222,14 @@ class SubjectsApi(CrudModelApi):
     model_type = Subject
     endpoint = 'subjects'
 
-    def find(self, since=None):
+    def find(self, since=None, custom_id=None):
         params = {}
         if since:
             if not isinstance(since, (datetime, date)):
                 raise TypeError("'since' parameter must be date or datetime")
             params['since'] = since.isoformat()
+        if custom_id:
+            params['custom_id'] = custom_id
         return ModelList(self, self.endpoint, params)
 
 
@@ -237,7 +241,9 @@ class InvoicesApi(CrudModelApi):
 
     STATUSES = ['open', 'sent', 'overdue', 'paid', 'cancelled']
 
-    def find(self, proforma=None, subject_id=None, since=None, number=None, status=None):
+    def find(self,
+             proforma=None, subject_id=None, since=None, number=None,
+             status=None, custom_id=None):
         params = {}
         if subject_id:
             if not isinstance(subject_id, int):
@@ -260,6 +266,9 @@ class InvoicesApi(CrudModelApi):
             endpoint = '{0}/proforma'.format(self.endpoint)
         else:
             endpoint = '{0}/regular'.format(self.endpoint)
+
+        if custom_id:
+            params['custom_id'] = custom_id
 
         return ModelList(self, endpoint, params)
 
